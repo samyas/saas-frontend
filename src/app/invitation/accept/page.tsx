@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { organizationApi } from '@/lib/api/organization';
 import { InvitationPreview } from '@/lib/types/organization';
@@ -10,7 +10,7 @@ import { Loader2, Building2, Mail, User, Calendar, AlertCircle } from 'lucide-re
 import { toast } from '@/lib/hooks/use-toast';
 import { useAuth } from '@/lib/hooks/useAuth';
 
-export default function AcceptInvitationPage() {
+function AcceptInvitationContent() {
   const [invitation, setInvitation] = useState<InvitationPreview | null>(null);
   const [loading, setLoading] = useState(true);
   const [accepting, setAccepting] = useState(false);
@@ -242,5 +242,13 @@ export default function AcceptInvitationPage() {
         </CardFooter>
       </Card>
     </div>
+  );
+}
+
+export default function AcceptInvitationPage() {
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <AcceptInvitationContent />
+    </Suspense>
   );
 }

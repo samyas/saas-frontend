@@ -352,6 +352,8 @@ export default function AdminPanelPage() {
                       currentPage={subsPage + 1}
                       totalPages={subscriptions.totalPages}
                       onPageChange={(page) => setSubsPage(page - 1)}
+                      hasNext={subsPage < subscriptions.totalPages - 1}
+                      hasPrevious={subsPage > 0}
                     />
                   </div>
                 )}
