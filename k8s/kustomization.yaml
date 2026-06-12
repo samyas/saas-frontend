@@ -1,0 +1,23 @@
+# =============================================================================
+# Kustomization file for SaaS Frontend K8s manifests
+# Allows easy deployment with: kubectl apply -k k8s/
+# =============================================================================
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+namespace: saas-frontend
+
+resources:
+  - configmap.yaml
+  - deployment.yaml
+  - service.yaml
+  - ingress.yaml
+
+commonLabels:
+  app.kubernetes.io/part-of: saas-frontend
+  app.kubernetes.io/managed-by: argocd
+
+# Image transformer - ArgoCD can override this
+images:
+  - name: ghcr.io/samyas/saas-frontend
+    newTag: latest

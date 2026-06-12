@@ -1,0 +1,38 @@
+# =============================================================================
+# Ingress for SaaS Frontend
+# Routes external traffic to the frontend service
+# =============================================================================
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: saas-frontend
+  namespace: saas-frontend
+  labels:
+    app: saas-frontend
+    app.kubernetes.io/name: saas-frontend
+  annotations:
+    # Use NGINX ingress controller
+    kubernetes.io/ingress.class: nginx
+    # Use self-signed certificate issuer
+    cert-manager.io/cluster-issuer: selfsigned-issuer
+    # NGINX specific annotations
+    nginx.ingress.kubernetes.io/proxy-body-size: "10m"
+    nginx.ingress.kubernetes.io/proxy-read-timeout: "60"
+    nginx.ingress.kubernetes.io/proxy-send-timeout: "60"
+spec:
+  ingressClassName: nginx
+  tls:
+    - hosts:
+        - saas.local
+      secretName: saas-frontend-tls
+  rules:
+    - host: saas.local
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: saas-frontend
+                port:
+                  number: 80

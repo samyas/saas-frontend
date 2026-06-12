@@ -1,0 +1,22 @@
+# =============================================================================
+# Service for SaaS Frontend
+# ClusterIP service for internal routing via Ingress
+# =============================================================================
+apiVersion: v1
+kind: Service
+metadata:
+  name: saas-frontend
+  namespace: saas-frontend
+  labels:
+    app: saas-frontend
+    app.kubernetes.io/name: saas-frontend
+    app.kubernetes.io/component: frontend
+spec:
+  type: ClusterIP
+  selector:
+    app: saas-frontend
+  ports:
+    - name: http
+      port: 80
+      targetPort: http
+      protocol: TCP

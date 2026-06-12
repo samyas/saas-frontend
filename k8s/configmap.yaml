@@ -1,0 +1,23 @@
+# =============================================================================
+# ConfigMap for SaaS Frontend
+# Runtime configuration injected into the application
+# =============================================================================
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: saas-frontend-config
+  namespace: saas-frontend
+  labels:
+    app: saas-frontend
+    app.kubernetes.io/name: saas-frontend
+    app.kubernetes.io/component: frontend
+data:
+  # Backend API URL - update this when backend is deployed
+  NEXT_PUBLIC_API_URL: "http://api.local"
+  
+  # Application settings
+  NODE_ENV: "production"
+  
+  # Feature flags (example)
+  NEXT_PUBLIC_FEATURE_ANALYTICS: "true"
+  NEXT_PUBLIC_FEATURE_DARK_MODE: "true"

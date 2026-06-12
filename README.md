@@ -1,36 +1,87 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# SaaS Frontend Configuration Files
 
-## Getting Started
+This folder contains all the files needed to enable CI/CD for the saas-frontend Next.js application.
 
-First, run the development server:
+## How to Use These Files
+
+Copy these files to your `saas-frontend` GitHub repository:
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+# Clone the saas-frontend repo
+git clone https://github.com/samyas/saas-frontend.git
+cd saas-frontend
+
+# Copy the Dockerfile
+cp /path/to/devops-super/saas-frontend-config/Dockerfile .
+
+# Copy GitHub Actions workflow
+mkdir -p .github/workflows
+cp /path/to/devops-super/saas-frontend-config/.github/workflows/build-and-push.yml .github/workflows/
+
+# Copy Kubernetes manifests
+mkdir -p k8s
+cp /path/to/devops-super/saas-frontend-config/k8s/* k8s/
+
+# Commit and push
+git add .
+git commit -m "feat: add CI/CD pipeline with Docker and K8s manifests"
+git push
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## Required Changes to next.config.ts
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+You MUST update your `next.config.ts` to enable standalone output:
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+```typescript
+import type { NextConfig } from 'next';
 
-## Learn More
+const nextConfig: NextConfig = {
+  output: 'standalone',  // <-- ADD THIS LINE
+  // ... your other config
+};
 
-To learn more about Next.js, take a look at the following resources:
+export default nextConfig;
+```
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Files Included
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+| File | Description |
+|------|-------------|
+| `Dockerfile` | Multi-stage build for Next.js with standalone output |
+| `next.config.ts.example` | Example config showing required settings |
+| `.github/workflows/build-and-push.yml` | GitHub Actions workflow for building and pushing to GHCR |
+| `k8s/configmap.yaml` | Runtime configuration (API URL, feature flags) |
+| `k8s/deployment.yaml` | Kubernetes deployment with health checks |
+| `k8s/service.yaml` | ClusterIP service |
+| `k8s/ingress.yaml` | NGINX ingress for saas.local domain |
+| `k8s/kustomization.yaml` | Kustomize configuration |
 
-## Deploy on Vercel
+## After Pushing
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+1. The GitHub Actions workflow will automatically build and push images to GHCR
+2. ArgoCD will detect the changes in the `k8s/` folder and deploy automatically
+3. Access the app at `http://saas.local` (or `http://localhost:3001` via port-forward)
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## Customization
+
+### Change API URL
+Edit `k8s/configmap.yaml`:
+```yaml
+data:
+  NEXT_PUBLIC_API_URL: "http://your-api-url.local"
+```
+
+### Change Replica Count
+Edit `k8s/deployment.yaml`:
+```yaml
+spec:
+  replicas: 3  # Change from 2 to desired count
+```
+
+### Change Domain
+Edit `k8s/ingress.yaml`:
+```yaml
+spec:
+  rules:
+    - host: your-domain.com  # Change from saas.local
+```
